@@ -1,0 +1,346 @@
+Connected to Oracle Database 21c Express Edition Release 21.0.0.0.0 
+Connected as sys@xe AS SYSDBA
+
+SQL> 
+SQL> CREATE TABLE Student (
+  2      StudentID INT PRIMARY KEY,
+  3      FirstName VARCHAR2(50),
+  4      LastName VARCHAR2(50),
+  5      Email VARCHAR2(100),
+  6      Nationality VARCHAR2(50)
+  7  );
+CREATE TABLE Student (
+    StudentID INT PRIMARY KEY,
+    FirstName VARCHAR2(50),
+    LastName VARCHAR2(50),
+    Email VARCHAR2(100),
+    Nationality VARCHAR2(50)
+)
+
+ORA-00955: name is already used by an existing object
+
+SQL> DROP TABLE Student;
+DROP TABLE Student
+
+ORA-02449: unique/primary keys in table referenced by foreign keys
+
+SQL> 
+SQL> BEGIN
+  2      EXECUTE IMMEDIATE 'DROP TABLE Enrollment CASCADE CONSTRAINTS';
+  3      EXECUTE IMMEDIATE 'DROP TABLE Course CASCADE CONSTRAINTS';
+  4      EXECUTE IMMEDIATE 'DROP TABLE ExchangeProgram CASCADE CONSTRAINTS';
+  5      EXECUTE IMMEDIATE 'DROP TABLE University CASCADE CONSTRAINTS';
+  6      EXECUTE IMMEDIATE 'DROP TABLE Student CASCADE CONSTRAINTS';
+  7  EXCEPTION
+  8      WHEN OTHERS THEN
+  9          NULL;
+ 10  END;
+ 11  /
+
+PL/SQL procedure successfully completed
+
+
+SQL> 
+SQL> CREATE TABLE Student (
+  2      StudentID INT PRIMARY KEY,
+  3      FirstName VARCHAR2(50),
+  4      LastName VARCHAR2(50),
+  5      Email VARCHAR2(100),
+  6      Nationality VARCHAR2(50)
+  7  );
+
+Table created
+
+
+SQL> 
+SQL> CREATE TABLE University (
+  2      UniversityID INT PRIMARY KEY,
+  3      Name VARCHAR2(100),
+  4      City VARCHAR2(50),
+  5      Country VARCHAR2(50)
+  6  );
+
+Table created
+
+
+SQL> 
+SQL> CREATE TABLE ExchangeProgram (
+  2      ProgramID INT PRIMARY KEY,
+  3      StudentID INT,
+  4      HomeUniversityID INT,
+  5      HostUniversityID INT,
+  6      StartDate DATE,
+  7      EndDate DATE,
+  8      FOREIGN KEY (StudentID) REFERENCES Student(StudentID),
+  9      FOREIGN KEY (HomeUniversityID) REFERENCES University(UniversityID),
+ 10      FOREIGN KEY (HostUniversityID) REFERENCES University(UniversityID)
+ 11  );
+
+Table created
+
+
+SQL> 
+SQL> CREATE TABLE Course (
+  2      CourseID INT PRIMARY KEY,
+  3      HostUniversityID INT,
+  4      CourseName VARCHAR2(100),
+  5      Credits INT,
+  6      FOREIGN KEY (HostUniversityID) REFERENCES University(UniversityID)
+  7  );
+
+Table created
+
+
+SQL> 
+SQL> CREATE TABLE Enrollment (
+  2      EnrollmentID INT PRIMARY KEY,
+  3      ProgramID INT,
+  4      CourseID INT,
+  5      Grade VARCHAR2(5),
+  6      FOREIGN KEY (ProgramID) REFERENCES ExchangeProgram(ProgramID),
+  7      FOREIGN KEY (CourseID) REFERENCES Course(CourseID)
+  8  );
+
+Table created
+
+
+SQL> 
+SQL> INSERT INTO Student VALUES (1, 'Alice', 'Smith', 'alice@example.com', 'Germany');
+
+1 row inserted
+
+
+SQL> INSERT INTO Student VALUES (2, 'Markus', 'Klein', 'markus@example.com', 'Austria');
+
+1 row inserted
+
+
+SQL> COMMIT;
+
+Commit complete
+
+
+SQL> 
+SQL> INSERT INTO ExchangeProgram VALUES (1, 1, 2, 1, TO_DATE('2025-02-01', 'YYYY-MM-DD'), TO_DATE('2025-06-30', 'YYYY-MM-DD'));
+INSERT INTO ExchangeProgram VALUES (1, 1, 2, 1, TO_DATE('2025-02-01', 'YYYY-MM-DD'), TO_DATE('2025-06-30', 'YYYY-MM-DD'))
+
+ORA-02291: integrity constraint (SYS.SYS_C008332) violated - parent key not found
+SQL> INSERT INTO ExchangeProgram VALUES (2, 2, 1, 2, TO_DATE('2025-02-01', 'YYYY-MM-DD'), TO_DATE('2025-06-30', 'YYYY-MM-DD'));
+INSERT INTO ExchangeProgram VALUES (2, 2, 1, 2, TO_DATE('2025-02-01', 'YYYY-MM-DD'), TO_DATE('2025-06-30', 'YYYY-MM-DD'))
+
+ORA-02291: integrity constraint (SYS.SYS_C008332) violated - parent key not found
+SQL> COMMIT;
+
+Commit complete
+
+
+SQL> 
+SQL> INSERT INTO Student VALUES (1, 'Alice', 'Smith', 'alice@example.com', 'Germany');
+INSERT INTO Student VALUES (1, 'Alice', 'Smith', 'alice@example.com', 'Germany')
+
+ORA-00001: unique constraint (SYS.SYS_C008327) violated
+SQL> INSERT INTO Student VALUES (2, 'Markus', 'Klein', 'markus@example.com', 'Austria');
+INSERT INTO Student VALUES (2, 'Markus', 'Klein', 'markus@example.com', 'Austria')
+
+ORA-00001: unique constraint (SYS.SYS_C008327) violated
+SQL> COMMIT;
+
+Commit complete
+
+
+SQL> 
+SQL> INSERT INTO Student VALUES (3, 'Alice', 'Smith', 'alice@example.com', 'Germany');
+
+1 row inserted
+
+
+SQL> INSERT INTO Student VALUES (4, 'Markus', 'Klein', 'markus@example.com', 'Austria');
+
+1 row inserted
+
+
+SQL> COMMIT;
+
+Commit complete
+
+
+SQL> 
+SQL> INSERT INTO ExchangeProgram VALUES (1, 3, 2, 1, TO_DATE('2025-02-01', 'YYYY-MM-DD'), TO_DATE('2025-06-30', 'YYYY-MM-DD'));
+INSERT INTO ExchangeProgram VALUES (1, 3, 2, 1, TO_DATE('2025-02-01', 'YYYY-MM-DD'), TO_DATE('2025-06-30', 'YYYY-MM-DD'))
+
+ORA-02291: integrity constraint (SYS.SYS_C008332) violated - parent key not found
+SQL> INSERT INTO ExchangeProgram VALUES (2, 4, 1, 2, TO_DATE('2025-02-01', 'YYYY-MM-DD'), TO_DATE('2025-06-30', 'YYYY-MM-DD'));
+INSERT INTO ExchangeProgram VALUES (2, 4, 1, 2, TO_DATE('2025-02-01', 'YYYY-MM-DD'), TO_DATE('2025-06-30', 'YYYY-MM-DD'))
+
+ORA-02291: integrity constraint (SYS.SYS_C008332) violated - parent key not found
+SQL> COMMIT;
+
+Commit complete
+
+
+SQL> 
+SQL> INSERT INTO University VALUES (1, 'University of Pécs', 'Pécs', 'Hungary');
+
+1 row inserted
+
+
+SQL> INSERT INTO University VALUES (2, 'Humboldt University', 'Berlin', 'Germany');
+
+1 row inserted
+
+
+SQL> COMMIT;
+
+Commit complete
+
+
+SQL> 
+SQL> INSERT INTO ExchangeProgram VALUES (1, 3, 2, 1, TO_DATE('2025-02-01', 'YYYY-MM-DD'), TO_DATE('2025-06-30', 'YYYY-MM-DD'));
+
+1 row inserted
+
+
+SQL> INSERT INTO ExchangeProgram VALUES (2, 4, 1, 2, TO_DATE('2025-02-01', 'YYYY-MM-DD'), TO_DATE('2025-06-30', 'YYYY-MM-DD'));
+
+1 row inserted
+
+
+SQL> COMMIT;
+
+Commit complete
+
+
+SQL> 
+SQL> INSERT INTO Course VALUES (1, 1, 'Database Systems', 6);
+
+1 row inserted
+
+
+SQL> INSERT INTO Course VALUES (2, 1, 'Hungarian Language Basics', 3);
+
+1 row inserted
+
+
+SQL> INSERT INTO Course VALUES (3, 2, 'AI and Ethics', 5);
+
+1 row inserted
+
+
+SQL> COMMIT;
+
+Commit complete
+
+
+SQL> 
+SQL> INSERT INTO Enrollment VALUES (1, 1, 1, 'A');
+
+1 row inserted
+
+
+SQL> INSERT INTO Enrollment VALUES (2, 1, 2, 'B');
+
+1 row inserted
+
+
+SQL> INSERT INTO Enrollment VALUES (3, 2, 3, 'A');
+
+1 row inserted
+
+
+SQL> COMMIT;
+
+Commit complete
+
+
+SQL> 
+SQL> SELECT s.FirstName, s.LastName, u.Name AS HostUniversity, c.CourseName, e.Grade
+  2  FROM Student s
+  3  JOIN ExchangeProgram ep ON s.StudentID = ep.StudentID
+  4  JOIN University u ON ep.HostUniversityID = u.UniversityID
+  5  JOIN Enrollment e ON ep.ProgramID = e.ProgramID
+  6  JOIN Course c ON e.CourseID = c.CourseID;
+
+FIRSTNAME                                          LASTNAME                                           HOSTUNIVERSITY                                                                   COURSENAME                                                                       GRADE
+-------------------------------------------------- -------------------------------------------------- -------------------------------------------------------------------------------- -------------------------------------------------------------------------------- -----
+Alice                                              Smith                                              University of Pécs                                                               Database Systems                                                                 A
+Alice                                              Smith                                              University of Pécs                                                               Hungarian Language Basics                                                        B
+Markus                                             Klein                                              Humboldt University                                                              AI and Ethics                                                                    A
+
+SQL> 
+SQL> CREATE OR REPLACE PROCEDURE EnrollStudent (
+  2      p_ProgramID IN INT,
+  3      p_CourseID IN INT,
+  4      p_Grade IN VARCHAR2
+  5  ) AS
+  6      v_NewEnrollmentID INT;
+  7  BEGIN
+  8      SELECT NVL(MAX(EnrollmentID), 0) + 1 INTO v_NewEnrollmentID FROM Enrollment;
+  9  
+ 10      INSERT INTO Enrollment (EnrollmentID, ProgramID, CourseID, Grade)
+ 11      VALUES (v_NewEnrollmentID, p_ProgramID, p_CourseID, p_Grade);
+ 12  
+ 13      COMMIT;
+ 14  END;
+ 15  /
+
+Procedure created
+
+
+SQL> 
+SQL> BEGIN
+  2      EnrollStudent(1, 2, 'A');
+  3  END;
+  4  /
+
+PL/SQL procedure successfully completed
+
+
+SQL> 
+SQL> CREATE TABLE EnrollmentLog (
+  2      LogID INT PRIMARY KEY,
+  3      EnrollmentID INT,
+  4      LogTime DATE
+  5  );
+
+Table created
+
+
+SQL> 
+SQL> CREATE OR REPLACE TRIGGER trg_LogEnrollment
+  2  AFTER INSERT ON Enrollment
+  3  FOR EACH ROW
+  4  BEGIN
+  5      INSERT INTO EnrollmentLog
+  6      VALUES (
+  7          (SELECT NVL(MAX(LogID), 0) + 1 FROM EnrollmentLog),
+  8          :NEW.EnrollmentID,
+  9          SYSDATE
+ 10      );
+ 11  END;
+ 12  /
+CREATE OR REPLACE TRIGGER trg_LogEnrollment
+AFTER INSERT ON Enrollment
+FOR EACH ROW
+BEGIN
+    INSERT INTO EnrollmentLog
+    VALUES (
+        (SELECT NVL(MAX(LogID), 0) + 1 FROM EnrollmentLog),
+        :NEW.EnrollmentID,
+        SYSDATE
+    );
+END;
+
+ORA-04089: cannot create triggers on objects owned by SYS
+
+SQL> 
+SQL> -- Run this once (as SYS)
+SQL> CREATE USER student_user IDENTIFIED BY student123;
+CREATE USER student_user IDENTIFIED BY student123
+
+ORA-00440: Message 440 not found;  product=RDBMS; facility=ORA
+SQL> GRANT CONNECT, RESOURCE TO student_user;
+GRANT CONNECT, RESOURCE TO student_user
+
+ORA-01917: user or role 'STUDENT_USER' does not exist
+
+SQL> 
